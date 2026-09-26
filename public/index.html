@@ -200,6 +200,11 @@
   .pitch-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; margin-bottom: 0.6rem; }
   .pitch-label { font-weight: 800; font-size: 1.05rem; }
   .pitch-when { font-size: 0.9rem; color: var(--muted); }
+  .after-actions { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; margin: -1rem 0 0; }
+  .review { list-style: none; padding: 0; margin: 0 0 1.5rem; }
+  .review li { background: var(--field); border-radius: 15px; padding: 1rem 1.1rem; margin-bottom: 0.75rem; }
+  .review-q { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .review-a { margin: 0 0 0.4rem; white-space: pre-wrap; }
   .more-link a { color: var(--cream); font-weight: 600; text-decoration-color: var(--gold); text-underline-offset: 4px; }
   .pitch-wrap .pitch { font-size: 1.15rem; }
   .keep { background: var(--navy); color: var(--cream); border-radius: 22px; padding: 2rem 1.75rem; }
@@ -501,11 +506,11 @@
       nodes.push(textarea, micButton(textarea, syncButton));
     }
 
-    const label = isLast ? "Stitch my pitch" : q.optional ? "Continue" : "Next";
+    const label = state.editing ? "Save" : isLast ? "Stitch my pitch" : q.optional ? "Continue" : "Next";
     const nextBtn = el("button", { class: "primary", onclick: next }, label);
     const actions = el("div", { class: "actions" }, nextBtn);
-    if (q.optional) actions.appendChild(el("button", { class: "link", onclick: () => { state.picks[q.key] = []; state.answers[q.key] = ""; go(i + 1); } }, "Skip"));
-    actions.appendChild(el("button", { class: "link", onclick: () => (i === 0 ? intro() : go(i - 1)) }, "Back"));
+    if (q.optional) actions.appendChild(el("button", { class: "link", onclick: () => { state.picks[q.key] = []; state.answers[q.key] = ""; state.editing ? review() : go(i + 1); } }, "Skip"));
+    actions.appendChild(el("button", { class: "link", onclick: () => (state.editing ? review() : i === 0 ? intro() : go(i - 1)) }, "Back"));
     nodes.push(actions);
     if (!q.chips) nodes.push(el("p", { class: "hint", text: "Tip: Ctrl or ⌘ + Enter to continue." }));
 
@@ -525,7 +530,11 @@
       if (q.chips && textarea) state.answers[q.key + "_own"] = textarea.value.trim();
       state.answers[q.key] = value();
 
+      // Editing from the review screen? Save and go straight back to the review.
+      if (state.editing) return review();
+
       // The tone question is quick and optional, so it moves on without a reaction.
+      
       if (q.key === "tone") return go(i + 1);
 
       busy = true;
@@ -636,8 +645,48 @@
         ),
         el("p", { class: "more-link" }, el("a", { href: SERVICES_URL, target: "_top" }, "Learn more about The Thread Pull →")),
         el("p", { class: "signoff", text: "You already have the story. Let's keep pulling. 🧵" })
+      ),
+      el("div", { class: "after-actions" },
+        el("button", { class: "link", onclick: review }, "✏️ Edit my answers"),
+        el("button", { class: "link", onclick: startOver }, "↺ Start over")
       )
     );
+  }
+
+  // ---------- Edit answers or start over from the results ----------
+
+  function review() {
+    state.editing = true;
+    state.step = TOTAL_STEPS;
+    const list = el("ol", { class: "review" });
+    QUESTIONS.forEach((q, i) => {
+      const answer = state.answers[q.key] || (q.optional ? "Skipped" : "");
+      list.appendChild(el("li", {},
+        el("div", { class: "review-q", text: q.title }),
+        el("p", { class: "review-a", text: answer }),
+        el("button", { class: "link", onclick: () => { state.step = i; question(q); } }, "Edit")
+      ));
+    });
+    show(
+      el("h2", { text: "Review your answers" }),
+      el("p", { class: "muted", text: "Change anything you'd like, then stitch a fresh pitch." }),
+      list,
+      el("div", { class: "actions" },
+        el("button", { class: "primary", onclick: () => { state.editing = false; generate(); } }, "Stitch my pitch again"),
+        el("button", { class: "link", onclick: startOver }, "Start over")
+      )
+    );
+  }
+
+  function startOver() {
+    if (!window.confirm("Start over? This clears all your answers.")) return;
+    state.step = -1;
+    state.answers = {};
+    state.picks = {};
+    state.followedUp = {};
+    state.reflection = {};
+    state.editing = false;
+    intro();
   }
 
   // Coming from the brand role quiz? A link like ?role=connector pre-selects their tone.
