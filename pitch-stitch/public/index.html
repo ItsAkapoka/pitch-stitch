@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Pitch Stitch | Thread Studio</title>
+<meta name="description" content="Craft a clear, confident elevator pitch that actually sounds like you. A free tool from Thread Studio.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧵</text></svg>">
+<style>
+  /* Thread Studio fonts, hosted with the page (no outside requests). */
+  /* To use your licensed Chunky Heart font, add chunky-heart.woff2 to /fonts. Until then, Bagel Fat One stands in. */
+  @font-face { font-family: "Chunky Heart"; src: url("fonts/chunky-heart.woff2") format("woff2"); font-display: swap; }
+  @font-face { font-family: "Bagel Fat One"; src: url("fonts/bagel-fat-one.woff2") format("woff2"); font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url("fonts/manrope-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url("fonts/manrope-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url("fonts/manrope-800.woff2") format("woff2"); font-weight: 800; font-display: swap; }
+  @font-face { font-family: "Satisfy"; src: url("fonts/satisfy.woff2") format("woff2"); font-display: swap; }
+
+  /* Brand tokens, pulled from threadstudiocollective.com and the logo. */
+  :root {
+    color-scheme: light;
+    --cream: #FDE8D8;
+    --navy: #1B2D4B;
+    --pink: #F9AED0;
+    --gold: #FFC354;
+    --orange: #EA5F39;
+    --red: #A60818;
+    --field: #FFF7F1;
+    --muted: #4A5872;
+    --rule: #EFCBB4;
+    --display: "Chunky Heart", "Bagel Fat One", "Arial Black", sans-serif;
+    --sans: "Manrope", "Helvetica Neue", Arial, sans-serif;
+    --script: "Satisfy", "Brush Script MT", cursive;
+  }
+
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--cream); color: var(--navy);
+    font-family: var(--sans); font-size: 1.0625rem; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 40rem; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; }
+
+  header.top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2.25rem; }
+  .brand img { display: block; width: 8.5rem; height: auto; }
+  .tool-name { font-family: var(--script); color: var(--orange); font-size: 1.35rem; line-height: 1.1; text-align: right; max-width: 12rem; }
+
+  /* The running stitch: dashes sew in as they answer, like the thread on the site. */
+  .stitch { display: flex; gap: 0.55rem; margin-bottom: 2.5rem; align-items: center; }
+  .stitch span { flex: 1; height: 4px; border-radius: 4px; background: var(--rule); transition: background-color 400ms ease; }
+  .stitch span.done { background: var(--orange); }
+  .stitch span.current { background: var(--pink); }
+  .stitch[hidden] { display: none; }
+
+  h1, h2 { font-family: var(--display); font-weight: 400; line-height: 1.08; margin: 0 0 1rem; color: var(--navy); }
+  h1 { font-size: clamp(2.5rem, 7.5vw, 3.6rem); }
+  h2 { font-size: clamp(1.75rem, 5vw, 2.35rem); }
+  .kicker { font-family: var(--script); color: var(--orange); font-size: 1.6rem; margin: 0 0 0.25rem; }
+  p { margin: 0 0 1rem; max-width: 36rem; }
+  .muted { color: var(--muted); }
+  .step-count { font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.8rem; color: var(--orange); margin-bottom: 0.75rem; }
+
+  textarea, input[type="text"], input[type="email"] {
+    width: 100%; font: inherit; color: var(--navy); background: var(--field);
+    border: 2px solid var(--rule); border-radius: 15px; padding: 0.9rem 1rem;
+    transition: border-color 150ms ease;
+  }
+  textarea { min-height: 9rem; resize: vertical; line-height: 1.55; }
+  textarea:focus, input:focus { outline: none; border-color: var(--navy); }
+  label.field { display: block; margin-bottom: 1.1rem; }
+  label.field span { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+
+  .reflection {
+    font-weight: 600; line-height: 1.5; margin: 0 0 1.5rem; padding: 0.2rem 0 0.2rem 1rem;
+    border-left: 4px dashed var(--orange); max-width: 34rem;
+  }
+  .mic-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem 0.9rem; margin-top: 0.6rem; }
+  .mic {
+    font: inherit; font-size: 0.9rem; font-weight: 600; color: var(--navy); background: transparent;
+    border: 2px dashed var(--orange); border-radius: 999px; padding: 0.4rem 0.95rem; cursor: pointer;
+  }
+  .mic[aria-pressed="true"] { background: var(--orange); border-style: solid; color: #fff; }
+  .mic-status { font-size: 0.875rem; color: var(--muted); }
+  .followup {
+    background: var(--pink); border-radius: 15px; padding: 0.9rem 1.1rem;
+    margin: 0 0 1.25rem; font-weight: 600; line-height: 1.5;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.25rem; padding: 0; list-style: none; }
+  .chip {
+    font: inherit; font-size: 0.95rem; font-weight: 600; color: var(--navy); background: var(--field);
+    border: 2px solid var(--rule); border-radius: 999px; padding: 0.45rem 1rem; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { border-color: var(--navy); background: var(--pink); }
+
+  .actions { display: flex; align-items: center; gap: 1.25rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  button.primary {
+    font: inherit; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.95rem;
+    color: var(--navy); background: var(--gold); border: 0; border-radius: 15px; padding: 0.95rem 1.7rem; cursor: pointer;
+    box-shadow: 0 3px 0 var(--navy); transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  button.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--navy); }
+  button.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--navy); }
+  button.primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: 0 3px 0 var(--navy); }
+  button.link {
+    font: inherit; font-weight: 600; color: var(--navy); background: none; border: 0; padding: 0.25rem 0;
+    cursor: pointer; text-decoration: underline; text-decoration-color: var(--orange); text-underline-offset: 4px;
+  }
+  button:focus-visible, a:focus-visible, .chip:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+  .hint { font-size: 0.875rem; color: var(--muted); }
+  .privacy { margin-top: 1.25rem; }
+
+  .consent { display: flex; gap: 0.7rem; align-items: flex-start; font-size: 0.95rem; color: var(--muted); margin: 0.5rem 0 0; }
+  .consent input { margin-top: 0.3rem; accent-color: var(--navy); width: 1.1rem; height: 1.1rem; flex: none; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .error { color: var(--red); font-weight: 600; margin-top: 1rem; }
+
+  /* Loading */
+  .sewing { display: flex; gap: 0.45rem; margin: 2rem 0 1.25rem; }
+  .sewing i { width: 1.5rem; height: 4px; border-radius: 4px; background: var(--orange); opacity: 0.2; animation: sew 1.4s ease-in-out infinite; }
+  .sewing i:nth-child(2) { animation-delay: 0.15s; }
+  .sewing i:nth-child(3) { animation-delay: 0.3s; }
+  .sewing i:nth-child(4) { animation-delay: 0.45s; }
+  .sewing i:nth-child(5) { animation-delay: 0.6s; }
+  @keyframes sew { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+  /* Results */
+  .result-section { margin-bottom: 2.75rem; }
+  .result-section h2 { font-size: clamp(1.5rem, 4.2vw, 1.9rem); margin-bottom: 0.9rem; }
+  .mirror { font-size: 1.15rem; line-height: 1.7; }
+  .pitch {
+    font-size: 1.25rem; font-weight: 600; line-height: 1.55; color: var(--navy);
+    background: var(--pink); border: 2px dashed var(--navy); border-radius: 18px;
+    padding: 1.5rem 1.6rem; margin: 0 0 1rem;
+  }
+  .pitch-wrap { background: var(--gold); border-radius: 22px; padding: 0.5rem; margin: 0 0 1rem; }
+  .pitch-wrap .pitch { margin: 0; }
+  .pitch-card { margin: 0 0 1.75rem; }
+  .pitch-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; margin-bottom: 0.6rem; }
+  .pitch-label { font-weight: 800; font-size: 1.05rem; }
+  .pitch-when { font-size: 0.9rem; color: var(--muted); }
+  .more-link a { color: var(--cream); font-weight: 600; text-decoration-color: var(--gold); text-underline-offset: 4px; }
+  .pitch-wrap .pitch { font-size: 1.15rem; }
+  .keep { background: var(--navy); color: var(--cream); border-radius: 22px; padding: 2rem 1.75rem; }
+  .keep h2 { color: var(--cream); }
+  .keep p { color: var(--cream); }
+  .cta-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 1rem; }
+  .cta-links a {
+    color: var(--cream); text-decoration: none; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.9rem;
+    border: 2px solid var(--cream); border-radius: 15px; padding: 0.8rem 1.3rem;
+  }
+  .cta-links a.fill { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .signoff { font-family: var(--script); font-size: 1.6rem; color: var(--pink) !important; margin: 0; }
+
+  footer { margin-top: 3rem; font-size: 0.85rem; color: var(--muted); }
+  footer a { color: inherit; text-decoration-color: var(--orange); }
+
+  .screen { animation: arrive 350ms ease both; }
+  @keyframes arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .sewing i { animation: none; }
+    .sewing i { opacity: 0.7; }
+    .stitch span, button.primary { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="https://threadstudiocollective.com" target="_top"><img src="logo.png" alt="Thread Studio" width="560" height="295"></a>
+    <span class="tool-name">free elevator pitch generator</span>
+  </header>
+
+  <div class="stitch" id="stitch" aria-hidden="true" hidden></div>
+
+  <main id="app" aria-live="polite"></main>
+
+  <footer>
+    Made with care by <a href="https://threadstudiocollective.com">Thread Studio</a>, San Antonio, TX.
+  </footer>
+</div>
+
+<script>
+(function () {
+  const BOOK_URL = "https://threadstudiocollective.com/contact";
+  const SERVICES_URL = "https://threadstudiocollective.com/services";
+
+  const QUESTIONS = [
+    {
+      key: "who",
+      title: "First, who do you serve?",
+      body: "Tell me about the people you work with or want to be known for helping.",
+      followup: "Can you get a little more specific? Where are they in their career or business, and what moment are they in when they find you?"
+    },
+    {
+      key: "problem",
+      title: "What are they struggling with before they work with you?",
+      body: "The challenge, frustration, or pain point. This can be practical, emotional, or both.",
+      followup: "What does that look like day to day? What are they saying to themselves when it isn't working?"
+    },
+    {
+      key: "how",
+      title: "How do you help them move forward or get unstuck?",
+      body: "Keep it simple and human. No need to sound polished.",
+      followup: "Walk me through it like you're explaining it to a friend. What actually happens when someone works with you?"
+    },
+    {
+      key: "credibility",
+      title: "What makes you uniquely qualified to help them?",
+      body: "Think about your experience, expertise, lived experience, career background, or perspective.",
+      followup: "What have you lived through or done that most people in your space haven't?"
+    },
+    {
+      key: "transformation",
+      title: "What changes for people after working with you?",
+      body: "How do they feel, or what becomes possible for them?",
+      followup: "Picture someone a few months after working with you. What are they doing now that they weren't before?"
+    },
+    {
+      key: "struggle",
+      title: "Last thing. What do you struggle with when talking about your work?",
+      body: "Sharing your story, explaining what you do, or putting yourself out there professionally. Pick any that fit, or write your own.",
+      chips: [
+        "Sounding too corporate", "Not knowing how to explain what I do", "Fear of judgment",
+        "Overexplaining", "Trying to sound professional instead of human", "Feeling scattered",
+        "Not knowing what makes me different"
+      ],
+      multi: true
+    },
+    {
+      key: "tone",
+      title: "Optional: what tone feels most like you?",
+      body: "Pick one, or skip and I'll keep it balanced.",
+      chips: [
+        "Visionary: bold and future focused", "Connector: warm and relational", "Guide: grounded and clear",
+        "Anchor: calm and trustworthy", "Disruptor: direct and unconventional"
+      ],
+      optional: true
+    }
+  ];
+
+  const TOTAL_STEPS = QUESTIONS.length;
+  const state = { step: -1, answers: {}, picks: {}, followedUp: {}, reflection: {}, followupText: {} };
+
+  const app = document.getElementById("app");
+  const stitch = document.getElementById("stitch");
+
+  for (let i = 0; i < TOTAL_STEPS; i++) stitch.appendChild(document.createElement("span"));
+
+  function drawStitch() {
+    stitch.hidden = state.step < 0 || state.step >= TOTAL_STEPS;
+    [...stitch.children].forEach((s, i) => {
+      s.className = i < state.step ? "done" : i === state.step ? "current" : "";
+    });
+  }
+
+  function el(tag, attrs, ...kids) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === "class") node.className = v;
+      else if (k === "text") node.textContent = v;
+      else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+      else node.setAttribute(k, v);
+    }
+    kids.flat().forEach((c) => c && node.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
+    return node;
+  }
+
+  function show(...nodes) {
+    stopDictation();
+    app.replaceChildren(el("div", { class: "screen" }, ...nodes));
+    drawStitch();
+    window.scrollTo({ top: 0 });
+    const focusable = app.querySelector("textarea, .chip");
+    if (focusable && state.step >= 0) focusable.focus({ preventScroll: true });
+  }
+
+  function words(text) { return (text || "").trim().split(/\s+/).filter(Boolean).length; }
+
+  // Asks the coach to react to an answer, like the conversation in a real session.
+  // If it's slow or fails, the tool quietly carries on without a reaction.
+  async function reflectOn(key, answer, followupAllowed) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const earlier = {};
+      QUESTIONS.forEach((q) => { if (q.key !== key && state.answers[q.key]) earlier[q.key] = state.answers[q.key]; });
+      const res = await fetch("/api/reflect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, answer, followupAllowed, earlier }),
+        signal: controller.signal
+      });
+      const data = await res.json();
+      return { reflection: data.reflection || "", followup: data.followup || "" };
+    } catch {
+      return { reflection: "", followup: "" };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // ---------- Dictation: speak an answer instead of typing ----------
+  // Uses the browser's built-in speech-to-text (Chrome, Edge, Safari). Hidden where unsupported.
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let activeDictation = null;
+
+  function stopDictation() {
+    if (activeDictation) { try { activeDictation.stop(); } catch {} activeDictation = null; }
+  }
+
+  function micButton(textarea, onChange) {
+    if (!Recognition) return null;
+    const status = el("span", { class: "mic-status", role: "status" });
+    const btn = el("button", { class: "mic", type: "button", "aria-pressed": "false" }, "🎙️ Speak your answer");
+    let rec = null;
+    let base = "";
+
+    function setListening(on) {
+      btn.setAttribute("aria-pressed", String(on));
+      btn.textContent = on ? "■ Stop" : "🎙️ Speak your answer";
+      status.textContent = on ? "Listening… talk it through, then tap stop." : "";
+    }
+
+    btn.addEventListener("click", () => {
+      if (rec) { rec.stop(); return; }
+      stopDictation();
+      rec = new Recognition();
+      rec.lang = navigator.language || "en-US";
+      rec.continuous = true;
+      rec.interimResults = true;
+      base = textarea.value.trim();
+      rec.onresult = (e) => {
+        let finalText = "", interim = "";
+        for (let i = 0; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) finalText += t; else interim += t;
+        }
+        textarea.value = [base, (finalText + interim).trim()].filter(Boolean).join(" ");
+        onChange();
+      };
+      rec.onerror = (e) => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          status.textContent = "To use dictation, allow microphone access in your browser, or just type.";
+        } else if (e.error === "no-speech") {
+          status.textContent = "I didn't catch anything. Tap to try again.";
+        }
+      };
+      rec.onend = () => {
+        const msg = status.textContent;
+        rec = null; activeDictation = null; setListening(false);
+        if (msg && !msg.startsWith("Listening")) status.textContent = msg;
+        textarea.focus();
+      };
+      activeDictation = rec;
+      try { rec.start(); setListening(true); } catch { rec = null; activeDictation = null; }
+    });
+
+    return el("div", { class: "mic-row" }, btn, status);
+  }
+
+  function intro() {
+    state.step = -1;
+    show(
+      el("p", { class: "kicker", text: "The Pitch Stitch" }),
+      el("h1", { text: "Let's craft your elevator pitch." }),
+      el("p", { text: "The kind that actually sounds like you and helps people quickly understand the value of what you do." }),
+      el("p", { class: "muted", text: "I'll guide you through a few quick questions, then turn your answers into a clear, human, and memorable starting point. It takes about five minutes." }),
+      el("div", { class: "actions" }, el("button", { class: "primary", onclick: () => go(0) }, "Start my pitch")),
+      el("p", { class: "hint privacy", text: "Your answers are used only to write your pitch. The tool doesn't save them." })
+    );
+  }
+
+  function go(step) { state.step = step; step < QUESTIONS.length ? question(QUESTIONS[step]) : generate(); }
+
+  function question(q, opts = {}) {
+    const i = state.step;
+    const isLast = i === QUESTIONS.length - 1;
+    const nodes = [];
+
+    // The coach's reaction to the previous answer, shown as the next question opens.
+    const prev = QUESTIONS[i - 1];
+    if (opts.reflection) nodes.push(el("p", { class: "reflection", text: opts.reflection }));
+    else if (!opts.followup && prev && state.reflection[prev.key] && opts.fromNext) nodes.push(el("p", { class: "reflection", text: state.reflection[prev.key] }));
+
+    nodes.push(
+      el("div", { class: "step-count", text: `Question ${i + 1} of ${QUESTIONS.length}` }),
+      el("h2", { id: "q-title", text: q.title }),
+      el("p", { class: "muted", text: q.body })
+    );
+
+    let textarea = null;
+
+    if (q.chips) {
+      const picks = state.picks[q.key] || [];
+      const list = el("ul", { class: "chips" });
+      q.chips.forEach((label) => {
+        const chip = el("button", { class: "chip", type: "button", "aria-pressed": String(picks.includes(label)) }, label);
+        chip.addEventListener("click", () => {
+          let current = state.picks[q.key] || [];
+          if (current.includes(label)) current = current.filter((c) => c !== label);
+          else current = q.multi ? [...current, label] : [label];
+          state.picks[q.key] = current;
+          [...list.querySelectorAll(".chip")].forEach((c) => c.setAttribute("aria-pressed", String(current.includes(c.textContent))));
+          syncButton();
+        });
+        list.appendChild(el("li", {}, chip));
+      });
+      nodes.push(list);
+      if (q.key === "struggle") {
+        textarea = el("textarea", { "aria-label": "Or describe it in your own words", placeholder: "Or say it in your own words..." });
+        textarea.style.minHeight = "5rem";
+        textarea.value = state.answers[q.key + "_own"] || "";
+        textarea.addEventListener("input", syncButton);
+        nodes.push(textarea, micButton(textarea, syncButton));
+      }
+    } else {
+      if (opts.followup) nodes.push(el("p", { class: "followup", text: opts.followup }));
+      textarea = el("textarea", { "aria-labelledby": "q-title" });
+      textarea.value = state.answers[q.key] || "";
+      textarea.addEventListener("input", syncButton);
+      textarea.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) next(); });
+      nodes.push(textarea, micButton(textarea, syncButton));
+    }
+
+    const label = isLast ? "Stitch my pitch" : q.optional ? "Continue" : "Next";
+    const nextBtn = el("button", { class: "primary", onclick: next }, label);
+    const actions = el("div", { class: "actions" }, nextBtn);
+    if (q.optional) actions.appendChild(el("button", { class: "link", onclick: () => { state.picks[q.key] = []; state.answers[q.key] = ""; go(i + 1); } }, "Skip"));
+    actions.appendChild(el("button", { class: "link", onclick: () => (i === 0 ? intro() : go(i - 1)) }, "Back"));
+    nodes.push(actions);
+    if (!q.chips) nodes.push(el("p", { class: "hint", text: "Tip: Ctrl or ⌘ + Enter to continue." }));
+
+    function value() {
+      if (q.chips) {
+        const own = textarea ? textarea.value.trim() : "";
+        return [...(state.picks[q.key] || []), own].filter(Boolean).join("; ");
+      }
+      return textarea.value.trim();
+    }
+    let busy = false;
+    function syncButton() { nextBtn.disabled = busy || (!q.optional && !value()); }
+
+    async function next() {
+      stopDictation();
+      if (busy || (!q.optional && !value())) return;
+      if (q.chips && textarea) state.answers[q.key + "_own"] = textarea.value.trim();
+      state.answers[q.key] = value();
+
+      // The tone question is quick and optional, so it moves on without a reaction.
+      if (q.key === "tone") return go(i + 1);
+
+      busy = true;
+      nextBtn.textContent = "Reading your answer…";
+      syncButton();
+      const followupAllowed = !q.chips && !state.followedUp[q.key];
+      let { reflection, followup } = await reflectOn(q.key, state.answers[q.key], followupAllowed);
+
+      // Backup if the coach couldn't respond: still nudge once on a very short answer.
+      if (!reflection && !followup && followupAllowed && words(state.answers[q.key]) < 8) followup = q.followup;
+
+      if (followup && followupAllowed) {
+        state.followedUp[q.key] = true;
+        return question(q, { reflection, followup });
+      }
+      state.reflection[q.key] = reflection;
+      state.step = i + 1;
+      if (state.step < QUESTIONS.length) question(QUESTIONS[state.step], { fromNext: true });
+      else generate();
+    }
+
+    show(...nodes);
+    syncButton();
+  }
+
+  async function generate() {
+    loading();
+    try {
+      const res = await fetch("/api/pitch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answers: {
+            who: state.answers.who, problem: state.answers.problem, how: state.answers.how,
+            credibility: state.answers.credibility, transformation: state.answers.transformation,
+            struggle: state.answers.struggle, tone: state.answers.tone || "neutral"
+          }
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.room) throw new Error(data.error || "Your pitch didn't come through this time. Your answers are saved, so try again.");
+      results(data);
+    } catch (err) {
+      tryAgain(err.message);
+    }
+  }
+
+  function tryAgain(message) {
+    state.step = TOTAL_STEPS;
+    show(
+      el("h2", { text: "Let's try that again." }),
+      el("p", { class: "error", role: "alert", text: message }),
+      el("div", { class: "actions" },
+        el("button", { class: "primary", onclick: generate }, "Try again"),
+        el("button", { class: "link", onclick: () => go(QUESTIONS.length - 1) }, "Back to my answers"))
+    );
+  }
+
+  function loading() {
+    state.step = TOTAL_STEPS;
+    show(
+      el("div", { class: "sewing", "aria-hidden": "true" }, el("i"), el("i"), el("i"), el("i"), el("i")),
+      el("h2", { text: "Pulling your threads." }),
+      el("p", { class: "muted", text: "Reading your answers back and shaping your pitch. This takes about twenty seconds." })
+    );
+  }
+
+  // Lu's approved next threads. The AI only picks the number; the words are always these.
+  const NEXT_THREADS = {
+    1: "You're carrying a few different audiences right now. A pitch can pick one for tonight's room, but deciding which one your brand is built for is positioning work. That's the first thread we'd pull together.",
+    2: "Your experience is the strongest thing in your story, and there's more of it than one pitch can hold. The next step is connecting it to the transformation you create, so people understand why you.",
+    3: "Your pitch says what you do. The next layer is naming what makes your way of doing it different from everyone else in your space, the thing that makes you referable.",
+    4: "This pitch works in conversation. Your LinkedIn, your website, and your speaker bio need the same clarity in different shapes. That's where your full brand story comes in.",
+    5: "There's a bigger story running under these answers: your path, your roots, the turns that got you here. That story is your strongest asset, and it's the part no one can copy."
+  };
+
+  function pitchCard(label, when, text) {
+    const copyBtn = el("button", { class: "link" }, "Copy");
+    copyBtn.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(text); copyBtn.textContent = "Copied"; }
+      catch { copyBtn.textContent = "Select the text to copy it"; }
+    });
+    return el("div", { class: "pitch-card" },
+      el("div", { class: "pitch-head" }, el("span", { class: "pitch-label", text: label }), el("span", { class: "pitch-when", text: when })),
+      el("div", { class: "pitch-wrap" }, el("p", { class: "pitch", text })),
+      copyBtn
+    );
+  }
+
+  function results({ mirror, handshake, room, nextThread }) {
+    state.step = TOTAL_STEPS + 1;
+
+    show(
+      el("section", { class: "result-section" },
+        el("h2", { text: "✨ What's already powerful here" }),
+        el("p", { class: "mirror", text: mirror })
+      ),
+      el("section", { class: "result-section" },
+        el("h2", { text: "🎤 Your elevator pitch, two ways" }),
+        el("p", { class: "muted", text: "Every room is different. Here are two starting points you can refine as your confidence and visibility grow." }),
+        pitchCard("🤝 The Handshake", "For one-on-one conversations", handshake),
+        pitchCard("🎙️ The Room", "For panels, workshops, and introductions", room)
+      ),
+      el("section", { class: "result-section keep" },
+        el("h2", { text: "🧵 The thread I'd pull next" }),
+        el("p", { text: NEXT_THREADS[nextThread] || NEXT_THREADS[4] }),
+        el("p", { text: "That's exactly what we'd do together in The Thread Pull, your 90-minute 1:1 brand audit." }),
+        el("div", { class: "cta-links" },
+          el("a", { class: "fill", href: BOOK_URL, target: "_top" }, "📅 Book your free fit call")
+        ),
+        el("p", { class: "more-link" }, el("a", { href: SERVICES_URL, target: "_top" }, "Learn more about The Thread Pull →")),
+        el("p", { class: "signoff", text: "You already have the story. Let's keep pulling. 🧵" })
+      )
+    );
+  }
+
+  // Coming from the brand role quiz? A link like ?role=connector pre-selects their tone.
+  const roleParam = new URLSearchParams(location.search).get("role");
+  if (roleParam) {
+    const toneQ = QUESTIONS.find((q) => q.key === "tone");
+    const match = toneQ.chips.find((c) => c.toLowerCase().startsWith(roleParam.toLowerCase()));
+    if (match) state.picks.tone = [match];
+  }
+
+  intro();
+})();
+</script>
+</body>
+</html>
