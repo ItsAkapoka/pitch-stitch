@@ -35,8 +35,7 @@ async function askClaude(env, { model, max_tokens, system, user }) {
   });
   if (!res.ok) {
   const errorText = await res.text();
-  console.error("Anthropic API error:", res.status, errorText);
-  throw new Error(`Anthropic ${res.status}`);
+  throw new Error(`ANTHROPIC_ERROR_${res.status}: ${errorText}`);
 }
   const data = await res.json();
   const text = (data.content || [])
