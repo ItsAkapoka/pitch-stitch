@@ -23,30 +23,51 @@ function json(body, status = 200) {
   });
 }
 
-async function askClaude(env, { model, max_tokens, system, user }) {
-
+async function askClaude(env, { model, max_tokens, system, user, schema }) {
+  // Claude fills in a form (a "tool") with fixed fields, so the reply is always readable,
+  // even when a pitch contains quotation marks or line breaks.
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-api-key": String(env.ANTHROPIC_API_KEY || "").trim(),
+      "x-api-key": env.ANTHROPIC_API_KEY,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({ model, max_tokens, system, messages: [{ role: "user", content: user }] }),
+    body: JSON.stringify({
+      model,
+      max_tokens,
+      system,
+      messages: [{ role: "user", content: user }],
+      tools: [{ name: "deliver", description: "Deliver the result to the person.", input_schema: schema }],
+      tool_choice: { type: "tool", name: "deliver" },
+    }),
   });
-  if (!res.ok) {
-  const errorText = await res.text();
-  throw new Error(`ANTHROPIC_ERROR_${res.status}: ${errorText}`);
-}
+  if (!res.ok) throw new Error(`Anthropic ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  const text = (data.content || [])
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("")
-    .replace(/```json|```/g, "")
-    .trim();
-  return JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+  const block = (data.content || []).find((b) => b.type === "tool_use");
+  if (!block || !block.input) throw new Error("Claude's reply had no result in it");
+  return block.input;
 }
+
+const PITCH_SCHEMA = {
+  type: "object",
+  properties: {
+    mirror: { type: "string", description: "The mirror paragraph" },
+    handshake: { type: "string", description: "The Handshake pitch" },
+    room: { type: "string", description: "The Room pitch" },
+    next_thread: { type: "integer", description: "The next thread number, 1 to 5" },
+  },
+  required: ["mirror", "handshake", "room", "next_thread"],
+};
+
+const REFLECT_SCHEMA = {
+  type: "object",
+  properties: {
+    reflection: { type: "string" },
+    followup: { type: "string" },
+  },
+  required: ["reflection", "followup"],
+};
 
 const SYSTEM_PROMPT = `You are a warm, strategic brand messaging coach from Thread Studio, a boutique brand strategy studio that helps founders, professionals, and thought leaders articulate their story with clarity and confidence.
 
@@ -114,12 +135,24 @@ What changes for them after: ${a.transformation}
 What I struggle with when talking about my work: ${a.struggle}
 Tone that feels most like me: ${a.tone || "neutral"}`;
 
-  const parsed = await askClaude(env, {
-    model: env.ANTHROPIC_MODEL || "claude-sonnet-5",
-    max_tokens: 1500,
-    system: SYSTEM_PROMPT,
-    user: userMessage,
-  });
+  // Try twice before giving up, so a rare hiccup never reaches the person.
+  let parsed;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      parsed = await askClaude(env, {
+        model: env.ANTHROPIC_MODEL || "claude-sonnet-5",
+        max_tokens: 1500,
+        system: SYSTEM_PROMPT,
+        user: userMessage,
+        schema: PITCH_SCHEMA,
+      });
+      break;
+    } catch (err) {
+      if (attempt === 2) throw err;
+      console.error("Pitch attempt 1 failed, retrying:", err);
+    }
+  }
+
   if (!parsed.mirror || !parsed.handshake || !parsed.room) throw new Error("Missing part of the result");
   const n = parseInt(parsed.next_thread, 10);
   return {
@@ -186,6 +219,8 @@ followup_allowed: ${body.followupAllowed ? "true" : "false"}`;
       max_tokens: 200,
       system: REFLECT_PROMPT,
       user,
+      schema: REFLECT_SCHEMA,
+
     });
     return json({
       reflection: noEmDashes(String(out.reflection || "")).slice(0, 300),
