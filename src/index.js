@@ -228,9 +228,9 @@ async function handlePitch(request, env) {
   try {
     return json(await writePitch(answers, env));
   } catch (err) {
-    console.error("Pitch generation failed:", err);
-    return json({ error: "Your pitch didn't come through this time. Your answers are still here, so try again." }, 502);
-  }
+  console.error("Pitch generation failed:", err);
+  return json({ error: String(err?.message || err) }, 502);
+}
 }
 
 export default {
