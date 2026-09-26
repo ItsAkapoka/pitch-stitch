@@ -1,9 +1,0 @@
-{
-  "name": "pitch-stitch",
-  "version": "1.1.0",
-  "private": true,
-  "type": "module",
-  "description": "The Pitch Stitch by Thread Studio: elevator pitch lead magnet with Kit email capture, on Cloudflare Workers",
-  "scripts": { "deploy": "wrangler deploy" },
-  "devDependencies": { "wrangler": "^4.0.0" }
-}
