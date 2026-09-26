@@ -33,7 +33,11 @@ async function askClaude(env, { model, max_tokens, system, user }) {
     },
     body: JSON.stringify({ model, max_tokens, system, messages: [{ role: "user", content: user }] }),
   });
-  if (!res.ok) throw new Error(`Anthropic ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+  const errorText = await res.text();
+  console.error("Anthropic API error:", res.status, errorText);
+  throw new Error(`Anthropic ${res.status}`);
+}
   const data = await res.json();
   const text = (data.content || [])
     .filter((b) => b.type === "text")
