@@ -8,7 +8,7 @@ The Pitch Stitch is an AI-powered elevator pitch generator built for Thread Stud
 
 The goal of The Pitch Stitch is to help professionals explain what they do in a way that feels clear, natural, and personal.
 
-Instead of simply asking users for information and returning a result, the tool creates an interactive experience. It reacts to users' answers, can ask follow-up questions when more detail is needed, and produces multiple versions of an elevator pitch for different situations.
+Instead of just simply asking users for information and returning a result, the tool creates an interactive experience. It reacts to users' answers, can ask follow-up questions when more detail is needed, and produces multiple versions of an elevator pitch for different situations.
 
 The project is deployed as a real web application and is connected to Thread Studio's existing website.
 
