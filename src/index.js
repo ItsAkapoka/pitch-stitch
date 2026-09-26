@@ -24,6 +24,9 @@ function json(body, status = 200) {
 }
 
 async function askClaude(env, { model, max_tokens, system, user }) {
+  console.log("Anthropic key present:", Boolean(env.ANTHROPIC_API_KEY));
+  console.log("Anthropic key length:", String(env.ANTHROPIC_API_KEY || "").trim().length);
+
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
