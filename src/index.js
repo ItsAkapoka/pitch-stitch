@@ -24,8 +24,6 @@ function json(body, status = 200) {
 }
 
 async function askClaude(env, { model, max_tokens, system, user }) {
-  console.log("Anthropic key present:", Boolean(env.ANTHROPIC_API_KEY));
-  console.log("Anthropic key length:", String(env.ANTHROPIC_API_KEY || "").trim().length);
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -232,7 +230,7 @@ async function handlePitch(request, env) {
     return json(await writePitch(answers, env));
   } catch (err) {
   console.error("Pitch generation failed:", err);
-  return json({ error: String(err?.message || err) }, 502);
+  return json({ error: "Your pitch didn't come through this time. Your answers are still here, so try again." }, 502);
 }
 }
 
