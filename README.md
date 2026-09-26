@@ -17,14 +17,19 @@ The project is deployed as a real web application and is connected to Thread Stu
 - AI-generated personalized elevator pitches
 - Seven-question interactive experience
 - AI reactions to user responses
-- Follow-up questions when answers need more detail
 - Multiple pitch formats, including "The Handshake" and "The Room"
+- Helpful hints that guide users toward stronger, more specific answers
+- Structured AI responses for more reliable pitch generation
+- Automatic retry if pitch generation encounters an API error
 - Speech-to-text answer input
 - Copy-to-clipboard functionality
 - Interactive UI and animated selection buttons
 - Responsive design for desktop and mobile
 - Error handling and API rate limiting
 - Secure API key management
+- Embedded directly into the Thread Studio Squarespace website
+- Automatic iframe resizing to match the tool's content
+- Automatic scrolling to the top of the tool between questions
 
 ## Technologies Used
 
@@ -38,11 +43,21 @@ The project is deployed as a real web application and is connected to Thread Stu
 
 ## How It Works
 
-The frontend collects the user's answers through an interactive questionnaire.
+The frontend guides users through seven questions about their audience, work, experience, and goals. Several questions include hints that help users give more specific answers.
 
-The application sends requests to a serverless backend running on Cloudflare Workers. The backend securely communicates with Anthropic's Claude API and returns personalized responses to the frontend.
+As users move through the experience, the application sends requests to a serverless backend running on Cloudflare Workers. The backend securely communicates with Anthropic's Claude API to generate short reactions and the final personalized pitch.
+
+Claude returns structured data with predefined fields instead of plain-text JSON. This makes responses more reliable when generated pitches contain quotation marks, line breaks, or other formatting that could otherwise cause parsing errors.
+
+The final generation step also automatically retries once if an API request fails before displaying an error to the user.
 
 The Anthropic API key is stored as a Cloudflare runtime secret so it is never exposed in the frontend or repository.
+
+The application is embedded into the Thread Studio Squarespace website. When embedded, Pitch Stitch communicates with the parent Squarespace page using browser `postMessage` events.
+
+A `ResizeObserver` detects changes to the application's height and tells the parent page to resize the embedded frame. This allows longer screens, including the final results, to expand naturally without creating a second scrollbar inside the tool.
+
+The application can also notify the parent page when users move to a new question so the page can scroll back to the top of the Pitch Stitch experience.
 
 ## Development & Debugging
 
@@ -54,20 +69,32 @@ After identifying the issue, I moved the API key to Cloudflare's runtime secrets
 
 This experience gave me hands-on experience debugging a deployed application, working with environment variables, API authentication, serverless infrastructure, and production logs.
 
+Later in development, I encountered another production issue where Claude successfully generated a pitch, but the application sometimes failed while parsing the response as JSON. Generated text could contain quotation marks or line breaks that made plain-text JSON unreliable.
+
+I updated the Anthropic integration to use structured tool responses with predefined schemas for both reactions and final pitches. I also added an automatic retry to the final pitch generation process so a temporary failure gets another attempt before reaching the user.
+
+I also simplified the user flow by removing AI-generated follow-up questions and adding contextual hints beneath key questions instead. This keeps users moving forward while still encouraging more detailed answers.
+
 ## What I Learned
 
 Through this project, I gained experience with:
 
 - Building and deploying a full web application
 - Connecting a frontend to a serverless backend
-- Working with external APIs
-- Handling JSON requests and responses
+- Working with external AI APIs
+- Handling structured API requests and responses
+- Designing schemas for reliable AI-generated data
 - Managing API keys and secrets securely
 - Debugging production errors using logs
+- Handling failures and implementing retry logic
 - Working with cloud deployment environments
 - Using GitHub for source control and deployment
 - Improving UI interactions and user experience
+- Designing user guidance without interrupting the main flow
 - Integrating a custom application with an existing business website
+- Communicating between an iframe and its parent page with `postMessage`
+- Using `ResizeObserver` to respond to dynamic layout changes
+- Integrating and dynamically resizing a web application inside Squarespace
 
 ## Project Structure
 
@@ -81,4 +108,6 @@ Through this project, I gained experience with:
 
 ## Status
 
-The Pitch Stitch is deployed and functional. Future updates may include additional UI improvements, analytics, custom domain integration, and improvements based on user feedback.
+The Pitch Stitch is deployed and functional as a live tool for Thread Studio. The application continues to be improved based on testing, user experience, and production reliability.
+
+Recent updates include structured AI responses, automatic retry handling, simplified question flow, contextual answer hints, and UI improvements.
