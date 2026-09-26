@@ -30,6 +30,10 @@ The project is deployed as a real web application and is connected to Thread Stu
 - Embedded directly into the Thread Studio Squarespace website
 - Automatic iframe resizing to match the tool's content
 - Automatic scrolling to the top of the tool between questions
+- Review screen for viewing all answers before regenerating a pitch
+- Ability to edit individual answers without restarting the questionnaire
+- Regenerate pitches using updated answers
+- Start-over option that safely clears the current session after confirmation
 
 ## Technologies Used
 
@@ -58,6 +62,10 @@ The application is embedded into the Thread Studio Squarespace website. When emb
 A `ResizeObserver` detects changes to the application's height and tells the parent page to resize the embedded frame. This allows longer screens, including the final results, to expand naturally without creating a second scrollbar inside the tool.
 
 The application can also notify the parent page when users move to a new question so the page can scroll back to the top of the Pitch Stitch experience.
+
+After receiving their results, users can review all of their original answers in one place. They can edit an individual response, save the change, and return to the review screen without repeating the entire questionnaire.
+
+Users can then regenerate their pitch using the updated answers. They can also choose to start over, which asks for confirmation before clearing the current answers and returning to the welcome screen.
 
 ## Development & Debugging
 
@@ -95,6 +103,11 @@ Through this project, I gained experience with:
 - Communicating between an iframe and its parent page with `postMessage`
 - Using `ResizeObserver` to respond to dynamic layout changes
 - Integrating and dynamically resizing a web application inside Squarespace
+- Managing application state across multiple screens
+- Building an edit-and-review workflow without restarting the application
+- Reusing existing question components for different user flows
+- Safely resetting application state
+- Designing confirmation steps for destructive user actions
 
 ## Project Structure
 
@@ -108,6 +121,21 @@ Through this project, I gained experience with:
 
 ## Status
 
-The Pitch Stitch is deployed and functional as a live tool for Thread Studio. The application continues to be improved based on testing, user experience, and production reliability.
+The Pitch Stitch is deployed and functional as a live tool for Thread Studio and is integrated directly into the company's Squarespace website.
 
-Recent updates include structured AI responses, automatic retry handling, simplified question flow, contextual answer hints, and UI improvements.
+Recent updates improved production reliability and user experience through structured AI responses, automatic retry handling, contextual answer hints, simplified question flow, dynamic embedded resizing, answer review and editing, pitch regeneration, and session reset controls.
+
+The application continues to be improved through testing, debugging, and feedback from real-world use.
+
+## Recent Updates
+
+### September 2026
+
+- Added structured Anthropic responses to prevent JSON parsing failures
+- Added automatic retry handling for pitch generation
+- Removed follow-up questions to create a smoother question flow
+- Added contextual hints to help users write stronger answers
+- Added dynamic resizing and scrolling for the Squarespace embed
+- Added a review screen for viewing and editing previous answers
+- Added pitch regeneration after editing answers
+- Added a confirmed "Start over" option that resets the session
