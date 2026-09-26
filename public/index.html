@@ -254,6 +254,7 @@
   const QUESTIONS = [
     {
       key: "who",
+      label: "Your people",
       hint: "The more specific, the better your pitch. Think career stage, industry, or the moment they're in when they find you.",
       title: "First, who do you serve?",
       body: "Tell me about the people you work with or want to be known for helping.",
@@ -261,6 +262,7 @@
     },
     {
       key: "problem",
+      label: "Their problem",
       hint: "Use the words they'd use to describe it. What do they say when it isn't working?",
       title: "What are they struggling with before they work with you?",
       body: "The challenge, frustration, or pain point. This can be practical, emotional, or both.",
@@ -268,13 +270,15 @@
     },
     {
       key: "how",
-      hint: "Describe it like you're telling a friend over coffee. What actually happens when someone works with you?",
+      label: "Your approach",
+      hint: "This is about your service or approach, not the results yet (that's coming next). Describe it like you're telling a friend over coffee: what do you actually do together?",
       title: "How do you help them move forward or get unstuck?",
-      body: "Keep it simple and human. No need to sound polished.",
+      body: "Your service, your process, or the way you work with people.",
       followup: "Walk me through it like you're explaining it to a friend. What actually happens when someone works with you?"
     },
     {
       key: "credibility",
+      label: "Your credibility",
       hint: "Include the unexpected parts too. Lived experience and career turns count.",
       title: "What makes you uniquely qualified to help them?",
       body: "Think about your experience, expertise, lived experience, career background, or perspective.",
@@ -282,6 +286,7 @@
     },
     {
       key: "transformation",
+      label: "The outcome",
       hint: "Think about how they feel after, not just what they get.",
       title: "What changes for people after working with you?",
       body: "How do they feel, or what becomes possible for them?",
@@ -289,6 +294,7 @@
     },
     {
       key: "struggle",
+      label: "Your tone",
       title: "Last thing. What do you struggle with when talking about your work?",
       body: "Sharing your story, explaining what you do, or putting yourself out there professionally. Pick any that fit, or write your own.",
       chips: [
@@ -466,7 +472,7 @@
     else if (!opts.followup && prev && state.reflection[prev.key] && opts.fromNext) nodes.push(el("p", { class: "reflection", text: state.reflection[prev.key] }));
 
     nodes.push(
-      el("div", { class: "step-count", text: `Question ${i + 1} of ${QUESTIONS.length}` }),
+      el("div", { class: "step-count", text: `${i + 1} of ${QUESTIONS.length} · ${q.label}` }),
       el("h2", { id: "q-title", text: q.title }),
       el("p", { class: "muted", text: q.body })
     );
