@@ -28,7 +28,7 @@ async function askClaude(env, { model, max_tokens, system, user }) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
+      "x-api-key": String(env.ANTHROPIC_API_KEY || "").trim(),
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({ model, max_tokens, system, messages: [{ role: "user", content: user }] }),
